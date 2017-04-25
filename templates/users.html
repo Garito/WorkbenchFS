@@ -1,0 +1,61 @@
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "snippets.html" import navbar with context -%}
+
+{%- extends "bootstrap/base.html" -%}
+{%- block title -%}Users{%- endblock -%}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>
+          {%- if current_user.is_authenticated and current_user.admin -%}
+            <small><a href="{{ url_for('user.add') }}"><i class="fa fa-plus"></i></a></small> 
+          {%- endif -%}
+          Users <small>({{ users | length }})</small></h1>
+        {{ flashed_messages(container = False) }}
+        <ul class="list-unstyled">
+          {%- for user in users -%}
+            <li>
+              <h4>
+                {%- if current_user.is_authenticated and (current_user.admin or current_user == user) -%}
+                  <small><a href="{{ url_for('user.edit', user = user.username) }}"><i class="fa fa-edit"></i></a></small>
+                {%- endif -%}
+                {{ user.username }}
+                <small>
+                  {%- if current_user.is_authenticated and current_user.admin -%}
+                    {%- if user.admin -%}
+                      <a href="{{ url_for('user.promote_down', user = user.username) }}"><i class="fa fa-star"></i></a>
+                    {%- else -%}
+                      <a href="{{ url_for('user.promote_up', user = user.username) }}"><i class="fa fa-star-o"></i></a>
+                    {%- endif -%}
+                  {%- else -%}
+                    {%- if user.admin -%}
+                      <i class="fa fa-star"></i>
+                    {%- else -%}
+                      <i class="fa fa-star-o"></i>
+                    {%- endif -%}
+                  {%- endif -%}
+                </small>
+                {%- if current_user.is_authenticated and (current_user.admin or current_user == user) -%}
+                  <small><a href="{{ url_for('user.remove', user = user.username) }}"><i class="fa fa-trash"></i></a></small>
+                {%- endif -%}
+              </h4>
+            </li>
+          {%- else -%}
+            <li>No users defined</li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}

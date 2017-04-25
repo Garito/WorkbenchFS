@@ -1,0 +1,33 @@
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "snippets.html" import navbar with context -%}
+
+{% extends "bootstrap/base.html" %}
+{% block title %}Welcome to the Workbench's server{% endblock %}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{% block content %}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>Welcome to the Workbench's server <small>Choose your option</small></h1>
+        {{ flashed_messages(container = False) }}
+        <div class="text-center">
+          <a href="{{ url_for('user.users') }}" class="btn btn-default">
+            <h2>
+              <div><i class="fa fa-users"></i></div>
+              <div>Users</div>
+            </h2>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
