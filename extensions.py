@@ -8,6 +8,3 @@ db = SQLAlchemy()
 
 from flask_login import LoginManager
 login_manager = LoginManager()
-
-from flask_session import Session
-sessions = Session()

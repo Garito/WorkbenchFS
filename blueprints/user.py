@@ -13,12 +13,12 @@ from extensions import db
 
 user_bp = Blueprint("user", __name__)
 
-@user_bp.route("/users")
+@user_bp.route("/")
 def users():
   users = User.query.all()
   return render_template("users.html", users = users)
 
-@user_bp.route("/users/add", methods = ["GET", "POST"])
+@user_bp.route("/add", methods = ["GET", "POST"])
 def add():
   if not getattr(current_user, "admin", False):
     return abort(401)
@@ -37,7 +37,7 @@ def add():
     return redirect(url_for("users"))
   return render_template("userForm.html", form = form)
 
-@user_bp.route("/users/<user>/edit", methods = ["GET", "POST"])
+@user_bp.route("/<user>/edit", methods = ["GET", "POST"])
 def edit(user):
   user = User.query.filter_by(username = user).first_or_404()
 
@@ -60,7 +60,7 @@ def edit(user):
     return redirect(url_for("users"))
   return render_template("userForm.html", mode = "edit", form = form, user = user)
 
-@user_bp.route("/users/<user>/remove")
+@user_bp.route("/<user>/remove")
 def remove(user):
   if not getattr(current_user, "admin", False) and current_user.username != user:
     return abort(401)
@@ -85,11 +85,11 @@ def promote(user, up = True):
 
   return redirect(request.referrer)
 
-@user_bp.route("/users/<user>/promote/up")
+@user_bp.route("/<user>/promote/up")
 def promote_up(user):
   return promote(user)
 
-@user_bp.route("/users/<user>/promote/down")
+@user_bp.route("/<user>/promote/down")
 def promote_down(user):
   return promote(user, False)
 

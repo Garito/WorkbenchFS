@@ -1,0 +1,35 @@
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "snippets.html" import navbar with context -%}
+{%- from "snippets.html" import ComputerIcon -%}
+
+{%- extends "bootstrap/base.html" -%}
+{%- block title -%}Computers{%- endblock -%}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>Computers <small>({{ items.total }})</small></h1>
+        {{ flashed_messages(container = False) }}
+        <div class="list-group">
+          {%- for item in items.items -%}
+            <a href="#">
+              {{ ComputerIcon(item) }} {{ item.label }}
+            </a>
+          {%- else -%}
+            <p class="list-group-item">No computers yet</p>
+          {%- endfor -%}
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}

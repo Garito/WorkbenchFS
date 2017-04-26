@@ -9,6 +9,16 @@ class Config(object):
   SQLALCHEMY_DATABASE_URI = "sqlite:///./data/data.db"
   SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+  DEVICE_TYPES = (("Desktop", "Desktop computer"), ("Laptop", "Laptop computer"), 
+                  ("Netbook", "Netbook"), ("Server", "Server"), ("Microtower", "Micro tower"))
+
+  VISUAL_GRADES = (("A", "Brand new device"), ("B", "Used, but no remarkable aesthetic defects"), 
+                   ("C", "Light aesthetic defects (scratches, dents, decoloration)"), ("D", "Serious aesthetic defects (cracked covers, broken parts)"))
+
+  FUNCTIONAL_GRADES = (("A", "Brand new device"), ("B", "Used, but no remarkable functional defects"), 
+                       ("C", "Light functional defects (soft noises, dead pixels, erased key labels)"), 
+                       ("D", "Serious functional defects (loud noises, annoying audio/video artifacts, missing keys)"))
+
 class ProdConfig(Config):
   pass
 

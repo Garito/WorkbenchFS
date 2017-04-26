@@ -4,9 +4,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.orm import model_form
-from wtforms import StringField, PasswordField, validators as wtf_v
+from wtforms import StringField, PasswordField, RadioField, TextAreaField, validators as wtf_v
 
 from flask_login import UserMixin
+
+from sqlalchemy_jsonfield import JSONField
 
 from extensions import db
 
@@ -50,3 +52,72 @@ class UserForm(model_form(User, base_class = FlaskForm)):
 class LoginForm(FlaskForm):
   username = StringField("Username", [wtf_v.Required(), wtf_v.length(max = 80)])
   password = PasswordField("Password", [wtf_v.Required(), wtf_v.length(max = 120)])
+
+class Computer(db.Model):
+  """Computer model"""
+  _uuid = db.Column(db.String(32), primary_key = True)
+  label = db.Column(db.String(256), unique = True)
+  dev_type = db.Column(db.String(128), nullable = False)
+
+  def __init__(self, uuid, label, dev_type):
+    self._uuid = uuid
+    self.label = label
+    self.dev_type = dev_type
+
+  def __repr__(self):
+    return "<{} {}>".format(self._type.capitalize(), self.label)
+
+class ComputerForm(model_form(Computer, base_class = FlaskForm)):
+  dev_type = RadioField("Device type")
+
+class Inventory(db.Model):
+  """Inventory model"""
+  _uuid = db.Column(db.String(32), primary_key = True)
+  created = db.Column(db.DateTime)
+
+  visual_grade = db.Column(db.String(1))
+  functional_grade = db.Column(db.String(1))
+  comments = db.Column(db.String(1024))
+
+  computer_uuid = db.Column(db.String(32), db.ForeignKey("computer._uuid"))
+  computer = db.relationship("Computer", backref = db.backref("computer", lazy = "dynamic"))
+
+  def __init__(self, uuid, created, computer):
+    self._uuid = uuid
+    self.created = created
+    self.computer_uuid = computer
+
+  def valuate(self, visual, functional, comments):
+    self.visual_grade = visual
+    self.functional_grade = functional
+    self.comments = comments
+
+  def __repr__(self):
+    return "<Inventory {}>".format(self.created)
+
+class AssessmentForm(model_form(Inventory, base_class = FlaskForm, only = ["visual_grade", "functional_grade", "comments"])):
+  visual_grade = RadioField("Visual grade")
+  functional_grade = RadioField("Functional grade")
+  comments = TextAreaField("Comments")
+
+class FullAssessmentForm(ComputerForm, AssessmentForm):
+  pass
+
+class InventoryPhase(db.Model):
+  """Inventory's phase model"""
+  _id = db.Column(db.Integer, primary_key = True)
+  created = db.Column(db.DateTime, nullable = False)
+
+  json = db.Column(JSONField(), nullable = False)
+
+  inventory_uuid = db.Column(db.String(32), db.ForeignKey("inventory._uuid"))
+  inventory = db.relationship("Inventory", backref = db.backref("phases", lazy = "dynamic"))
+
+  def __init__(self, created, json):
+    self.created = created
+    self.json = json
+
+  def __repr__(self):
+    return "<Phase for inventory {}>".format(self.inventory_uuid)
+
+  

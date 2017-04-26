@@ -1,0 +1,41 @@
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "snippets.html" import navbar with context -%}
+{%- from "snippets.html" import ComputerIcon -%}
+{%- from "snippets.html" import inventory_tr -%}
+
+{%- extends "bootstrap/base.html" -%}
+{%- block title -%}Inventories{%- endblock -%}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>Inventories <small>({{ items.total }})</small></h1>
+        {{ flashed_messages(container = False) }}
+        <div class="table-responsive">
+          <table class="table" last="{{ items.query.first().created.isoformat() }}">
+            {%- for item in items.items -%}
+              {{ inventory_tr(item) }}
+            {%- endfor -%}
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}
+
+{%- block scripts -%}
+  {{ super() }}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js" integrity="sha256-/ioiJhI6NkoUDkSyBru7JZUGXGQhdml6amBC3ApTf5A=" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename = 'js/javascript.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/inventories.js') }}"></script>
+{%- endblock -%}

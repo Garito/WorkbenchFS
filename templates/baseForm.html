@@ -1,0 +1,54 @@
+{%- from "bootstrap/wtf.html" import form_errors -%}
+{%- from "bootstrap/wtf.html" import form_field -%}
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "snippets.html" import navbar with context -%}
+
+{%- extends "bootstrap/base.html" -%}
+{%- block title -%}{{ title }}{%- endblock -%}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- macro set_autofocus(field, autofocus = False) -%}
+  {%- if autofocus -%}
+    {{ form_field(field, autofocus = True)}}
+  {%- else -%}
+    {{ form_field(field)}}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- macro my_form_field(field, autofocus = False) -%}
+  {%- if field.type in ["RadioField", "BooleanField"] -%}
+    <div class="form-group">
+      {{ field.label }}
+      {{ set_autofocus(field, autofocus) }}
+    </div>
+  {%- else -%}
+    {{ set_autofocus(field, autofocus) }}
+  {%- endif -%}
+{%- endmacro -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>{{ title }}</h1>
+        <form id="{{ form.name }}" class="form" method="post" role="form">
+          {{ form.hidden_tag() }}
+          {{ form_errors(form) }}
+          {{ flashed_messages(container = False) }}
+          {%- for field in form if field.type not in ["HiddenField", "CSRFTokenField"] -%}
+            {{ my_form_field(field, autofocus = (not loop.index0)) }}
+          {%- endfor -%}
+          <button type="submit" class="btn btn-primary">{{ btnSubmit }}</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}

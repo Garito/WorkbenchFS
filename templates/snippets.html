@@ -18,3 +18,52 @@
     </div>
   </nav>
 {%- endmacro -%}
+
+{%- macro ComputerIcon(computer) -%}
+  {%- if computer._type == "Laptop" -%}
+    {%- set icon = "laptop" -%}
+  {%- elif computer._type == "Netbook" -%}
+    {%- set icon = "laptop netbook" -%}
+  {%- elif computer._type == "Server" -%}
+    {%- set icon = "server" -%}
+  {%- elif computer._type == "Microtower" -%}
+    {%- set icon = "building-o" -%}
+  {%- else -%}
+    {%- set icon = "desktop" -%}
+  {%- endif -%}
+  <i class="fa fa-{{ icon }}"></i>
+{%- endmacro -%}
+
+{%- macro inventory_tr(inv) -%}
+  <tr id="{{ inv._uuid }}" computer="{{ inv.computer_uuid }}">
+    <td>
+      <a href="#">
+        <time datetime="{{ inv.created }}">{{ inv.created }}</time>
+      </a>
+    </td>
+    <td>
+      {%- if inv.computer -%}
+        {{ ComputerIcon(inv.computer) }} {{ inv.computer.label }}
+      {%- else -%}
+        &nbsp;
+      {%- endif -%}
+    </td>
+    <td>
+      {%- if inv.visual_grade -%}
+        {{ inv.visual_grade }} {{ inv.functional_grade }}
+      {%- else -%}
+        &nbsp;
+      {%- endif -%}
+    </td>
+    <td class="usb">
+      {%- if not inv.computer or not inv.visual_grade -%}
+        <a href="{{ url_for('inventory.assess', inv = inv._uuid) }}"{% if inv.computer_uuid not in usbs %} class="hidden"{% endif %}>
+          <i class="fa fa-usb"></i>
+        </a>
+      {%- else -%}
+        &nbsp;
+      {%- endif -%}
+    </td>
+    <td>{{ inv.phases.count() }}</td>
+  </tr>
+{%- endmacro -%}
