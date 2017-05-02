@@ -1,0 +1,57 @@
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "bootstrap/pagination.html" import render_pagination -%}
+{%- from "snippets.html" import navbar with context -%}
+{%- from "snippets.html" import ComputerIcon -%}
+{%- from "snippets.html" import inventory_computer -%}
+{%- from "snippets.html" import inventory_tr -%}
+
+{%- extends "bootstrap/base.html" -%}
+
+{%- block title -%}Computer {{ comp.label }}{%- endblock -%}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1><small><a href="{{ url_for('computer.computers') }}"><i class="fa fa-chevron-left"></i></a></small> {{ ComputerIcon(comp) }} {{ comp.label }}</h1>
+        {{ flashed_messages(container = False) }}
+        {{ inventory_computer(invs.items[0]) }}
+        <h3>Inventories</h3>
+        <div class="table-responsive">
+          <table class="table">
+            {%- set last_date = {"value": None} -%}
+            {%- for inv in invs.items -%}
+              {%- if inv.created.date() != last_date["value"] -%}
+                {%- if last_date.update({"value": inv.created.date()}) -%}{%- endif -%}
+                <tr>
+                  <th class="date" colspan="5"><time datetime="{{ last_date['value'] }}">{{ last_date["value"] }}</time></th>
+                </tr>
+              {%- endif -%}
+              {{ inventory_tr(inv, False) }}
+            {%- endfor -%}
+          </table>
+          <div class="pagination text-center col-xs-12">
+            {%- if invs.pages > 1 -%}
+              {{ render_pagination(invs) }}
+            {%- endif -%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}
+
+{%- block scripts -%}
+  {{ super() }}
+  <script src="{{ url_for('static', filename = 'libs/momentjs/2.18.1/moment-with-locales.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/javascript.js') }}"></script>
+{%- endblock -%}

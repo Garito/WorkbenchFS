@@ -2,7 +2,7 @@
 
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
 
-from models import Computer, ComputerForm
+from models import Computer, ComputerForm, Inventory
 
 from extensions import db
 
@@ -38,3 +38,10 @@ def add(uuid):
     return redirect(url_for("tests.tests"))
 
   return render_template("baseForm.html", title = "Add computer", form = form, btnSubmit = "Add")
+
+@comp_bp.route("/<uuid>")
+def computer(uuid):
+  comp = Computer.query.get_or_404(uuid)
+  inventories = comp.inventories.order_by(Inventory.created.desc()).paginate()
+  return render_template("computer.html", comp = comp, invs = inventories)
+
