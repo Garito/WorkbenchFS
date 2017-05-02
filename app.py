@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 
+from os import environ
+
+from json import dumps
+
 from dateutil.parser import parse
 
 from flask import Flask, render_template, render_template_string, request, flash, redirect, url_for, jsonify
@@ -20,7 +24,9 @@ def create_app(name, config = None):
   app = Flask(name)
   app.usbs = {}
 
-  if config is None:
+  if "FLASK_CONFIG" in environ:
+    config = environ["FLASK_CONFIG"]
+  elif config is None:
     config = "config.DevelConfig"
   app.config.from_object(config)
 
@@ -36,6 +42,10 @@ def create_app(name, config = None):
   return app
 
 app = create_app(__name__)
+
+@app.template_filter("pretty_json")
+def pretty_json(j):
+  return dumps(j, indent = 2)
 
 @login_manager.user_loader
 def load_user(user_id):
