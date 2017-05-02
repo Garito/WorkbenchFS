@@ -34,7 +34,7 @@ def add():
 
     flash("User {} has been created".format(user.username), "success")
 
-    return redirect(url_for("users"))
+    return redirect(url_for("user.users"))
   return render_template("userForm.html", form = form)
 
 @user_bp.route("/<user>/edit", methods = ["GET", "POST"])
