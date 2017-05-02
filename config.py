@@ -9,6 +9,8 @@ class Config(object):
   SQLALCHEMY_DATABASE_URI = "sqlite:///./data/data.db"
   SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+  BOOTSTRAP_SERVE_LOCAL = True
+
   DEVICE_TYPES = (("Desktop", "Desktop computer"), ("Laptop", "Laptop computer"), 
                   ("Netbook", "Netbook"), ("Server", "Server"), ("Microtower", "Micro tower"))
 
@@ -19,10 +21,14 @@ class Config(object):
                        ("C", "Light functional defects (soft noises, dead pixels, erased key labels)"), 
                        ("D", "Serious functional defects (loud noises, annoying audio/video artifacts, missing keys)"))
 
+  TOTAL_PHASES = 6
+
 class ProdConfig(Config):
   pass
 
 class DevelConfig(Config):
+  TEMPLATES_AUTO_RELOAD = True
+
   DEBUB = True
   DEBUG_TB_ENABLED = True
   DEBUG_TB_INTERCEPT_REDIRECTS = False
