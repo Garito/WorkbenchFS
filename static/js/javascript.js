@@ -3,8 +3,11 @@ function convertTimes() {
 
   $("time").each(function() {
     var $this = $(this);
-
-    $this.html(moment($this.attr("datetime")).format("HH:mm:ss"));
+    if($this.parent().hasClass("date")) {
+      $this.html(moment($this.attr("datetime")).format("LL"));
+    } else {
+      $this.html(moment($this.attr("datetime")).format("HH:mm:ss"));
+    }
   });
 }
 
