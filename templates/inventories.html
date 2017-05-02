@@ -1,4 +1,5 @@
 {%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "bootstrap/pagination.html" import render_pagination -%}
 {%- from "snippets.html" import navbar with context -%}
 {%- from "snippets.html" import ComputerIcon -%}
 {%- from "snippets.html" import inventory_tr -%}
@@ -8,7 +9,7 @@
 
 {%- block styles -%}
   {{ super() }}
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 {%- endblock -%}
 
 {%- block navbar -%}
@@ -23,10 +24,22 @@
         {{ flashed_messages(container = False) }}
         <div class="table-responsive">
           <table class="table" last="{{ items.query.first().created.isoformat() }}">
+            {%- set last_date = {"value": None} -%}
             {%- for item in items.items -%}
+              {%- if item.created.date() != last_date["value"] -%}
+                {%- if last_date.update({"value": item.created.date()}) -%}{%- endif -%}
+                <tr>
+                  <th class="date" colspan="5"><time datetime="{{ last_date['value'] }}">{{ last_date["value"] }}</time></th>
+                </tr>
+              {%- endif -%}
               {{ inventory_tr(item) }}
             {%- endfor -%}
           </table>
+        </div>
+        <div class="pagination text-center col-xs-12">
+          {%- if items.pages > 1 -%}
+            {{ render_pagination(items) }}
+          {%- endif -%}
         </div>
       </div>
     </div>
@@ -35,7 +48,7 @@
 
 {%- block scripts -%}
   {{ super() }}
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment-with-locales.min.js" integrity="sha256-/ioiJhI6NkoUDkSyBru7JZUGXGQhdml6amBC3ApTf5A=" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename = 'libs/momentjs/2.18.1/moment-with-locales.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/javascript.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/inventories.js') }}"></script>
 {%- endblock -%}

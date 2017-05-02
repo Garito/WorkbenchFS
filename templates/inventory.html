@@ -1,0 +1,78 @@
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "snippets.html" import navbar with context -%}
+{%- from "snippets.html" import ComputerIcon -%}
+{%- from "snippets.html" import inventory_computer -%}
+
+{%- extends "bootstrap/base.html" -%}
+
+{%- block title -%}Inventory{%- endblock -%}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.css" rel="stylesheet">
+  <style>
+    .CodeMirror { height: auto; }
+  </style>
+
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>
+          <small><a href="{{ url_for('inventory.inventories') }}"><i class="fa fa-chevron-left"></i></a></small>
+          Inventory on <time datetime="{{ inv.created.isoformat() }}">inv.created</time>
+        </h1>
+        {{ flashed_messages(container = False) }}
+        <div class="media">
+          <div class="media-left media-middle text-center">
+            <h2>{{ ComputerIcon(inv.computer) }}</h2>
+            <div>{{ inv.computer.dev_type }}</div>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading">
+              {%- if inv.computer -%}
+                {{ inv.computer.label }} {{ inv.visual_grade }} {{ inv.functional_grade }}
+              {%- else -%}
+                Not identified yet
+              {%- endif -%}
+            </h4>
+            {{ inventory_computer(inv) }}
+            {%- if inv.comments -%}
+              <div class="comments">{{ inv.comments }}</div>
+            {%- endif -%}
+          </div>
+        </div>
+        <h3>Phases <small>({{ inv.phases.count() }})</small></h3>
+        <table class="table">
+          {%- for phase in inv.phases -%}
+            <tr>
+              <td><time datetime="{{ phase.created.isoformat() }}">{{ phase.created }}</time></td>
+              <td><div class="codemirror">{{ phase.json | pretty_json | safe }}</div></td>
+            </tr>
+          {%- endfor -%}
+        </table>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}
+
+{%- block scripts -%}
+  {{ super() }}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/addon/runmode/runmode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/addon/runmode/colorize.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.2/mode/javascript/javascript.min.js" integrity="sha256-N/yi99LnUpZtDxkbxqZN8IdK8NuEbll3ljpVc5LOUcg=" crossorigin="anonymous"></script>
+
+  <script src="{{ url_for('static', filename = 'libs/momentjs/2.18.1/moment-with-locales.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/codemirrorize.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/javascript.js') }}"></script>
+{%- endblock -%}

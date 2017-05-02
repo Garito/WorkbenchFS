@@ -78,7 +78,12 @@ def assess(inv):
 
     flash(flash_message)
 
-    return redirect(url_for("test.tests"))
+    return redirect(url_for("inventory.inventories"))
 
-  return render_template("baseForm.html", title = title, form = form, btnSubmit = "Add")
+  return render_template("baseForm.html", title = title, form = form, btnSubmit = "Add", with_qr = True)
+
+@inv_bp.route("/<uuid>")
+def inventory(uuid):
+  inv = Inventory.query.get_or_404(uuid)
+  return render_template("inventory.html", inv = inv)
 
