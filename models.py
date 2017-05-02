@@ -2,6 +2,8 @@
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from flask import current_app
+
 from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.orm import model_form
 from wtforms import StringField, PasswordField, RadioField, TextAreaField, validators as wtf_v
@@ -11,6 +13,9 @@ from flask_login import UserMixin
 from sqlalchemy_jsonfield import JSONField
 
 from extensions import db
+
+class QRField(StringField):
+  pass
 
 class User(db.Model, UserMixin):
   """User model"""
@@ -67,7 +72,8 @@ class Computer(db.Model):
   def __repr__(self):
     return "<{} {}>".format(self._type.capitalize(), self.label)
 
-class ComputerForm(model_form(Computer, base_class = FlaskForm)):
+class ComputerForm(FlaskForm):
+  label = QRField("Label")
   dev_type = RadioField("Device type")
 
 class Inventory(db.Model):
@@ -80,7 +86,7 @@ class Inventory(db.Model):
   comments = db.Column(db.String(1024))
 
   computer_uuid = db.Column(db.String(32), db.ForeignKey("computer._uuid"))
-  computer = db.relationship("Computer", backref = db.backref("computer", lazy = "dynamic"))
+  computer = db.relationship("Computer", backref = db.backref("inventories", lazy = "dynamic"))
 
   def __init__(self, uuid, created, computer):
     self._uuid = uuid
@@ -91,6 +97,16 @@ class Inventory(db.Model):
     self.visual_grade = visual
     self.functional_grade = functional
     self.comments = comments
+
+  def finished_percent(self):
+    return self.phases.count() * 100 / current_app.config["TOTAL_PHASES"]
+
+  def get_component_key(self, name, key = None):
+    for component in self.phases[0].json["components"]:
+      if component["@type"] == name:
+        return component[key] if key else component
+
+    return None
 
   def __repr__(self):
     return "<Inventory {}>".format(self.created)
