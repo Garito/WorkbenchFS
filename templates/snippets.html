@@ -20,13 +20,13 @@
 {%- endmacro -%}
 
 {%- macro ComputerIcon(computer) -%}
-  {%- if computer._type == "Laptop" -%}
+  {%- if computer.dev_type == "Laptop" -%}
     {%- set icon = "laptop" -%}
-  {%- elif computer._type == "Netbook" -%}
+  {%- elif computer.dev_type == "Netbook" -%}
     {%- set icon = "laptop netbook" -%}
-  {%- elif computer._type == "Server" -%}
+  {%- elif computer.dev_type == "Server" -%}
     {%- set icon = "server" -%}
-  {%- elif computer._type == "Microtower" -%}
+  {%- elif computer.dev_type == "Microtower" -%}
     {%- set icon = "building-o" -%}
   {%- else -%}
     {%- set icon = "desktop" -%}
@@ -34,20 +34,22 @@
   <i class="fa fa-{{ icon }}"></i>
 {%- endmacro -%}
 
-{%- macro inventory_tr(inv) -%}
+{%- macro inventory_tr(inv, ident = True) -%}
   <tr id="{{ inv._uuid }}" computer="{{ inv.computer_uuid }}">
     <td>
-      <a href="#">
+      <a href="{{ url_for('inventory.inventory', uuid = inv._uuid) }}">
         <time datetime="{{ inv.created }}">{{ inv.created }}</time>
       </a>
     </td>
-    <td>
-      {%- if inv.computer -%}
-        {{ ComputerIcon(inv.computer) }} {{ inv.computer.label }}
-      {%- else -%}
-        &nbsp;
-      {%- endif -%}
-    </td>
+    {%- if ident -%}
+      <td>
+        {%- if inv.computer -%}
+          {{ ComputerIcon(inv.computer) }} {{ inv.computer.label }}
+        {%- else -%}
+          &nbsp;
+        {%- endif -%}
+      </td>
+    {%- endif -%}
     <td>
       {%- if inv.visual_grade -%}
         {{ inv.visual_grade }} {{ inv.functional_grade }}
@@ -64,6 +66,51 @@
         &nbsp;
       {%- endif -%}
     </td>
-    <td>{{ inv.phases.count() }}</td>
+    {%- if inv.finished_percent() < 50 -%}
+      {%- set finished_class = "bg-danger" -%}
+    {%- elif inv.finished_percent() < 75 -%}
+      {%- set finished_class = "bg-warning" -%}
+    {%- else -%}
+      {%- set finished_class = "bg-success" -%}
+    {%- endif -%}
+    <td class="text-center {{ finished_class }}">{{ inv.phases.count() }}</td>
   </tr>
+{%- endmacro -%}
+
+{%- macro inventory_computer(inv) -%}
+  <div class="computer">
+    {{ inv.phases[0].json["device"]["manufacturer"] }} {{ inv.phases[0].json["device"]["model"] }}
+  </div>
+  <div class="cpu">
+    {{ inv.get_component_key("Processor", "manufacturer") }} {{ inv.get_component_key("Processor", "model") }} 
+    ({{ inv.get_component_key("Processor", "benchmark")["score"] }})
+  </div>
+  {%- if inv.get_component_key("RamModule") -%}
+    <div class="ram">
+      {{ inv.get_component_key("RamModule", "manufacturer") }} {{ inv.get_component_key("RamModule", "interface") }} 
+      {{ inv.get_component_key("RamModule", "size") }} ({{ inv.get_component_key("RamModule", "speed") }})
+    </div>
+  {%- endif -%}
+  <div class="graphic">
+    {{ inv.get_component_key("GraphicCard", "manufacturer") }} {{ inv.get_component_key("GraphicCard", "model") }} 
+    ({{ inv.get_component_key("GraphicCard", "memory") }})
+  </div>
+  <div class="disk">
+    {{ inv.get_component_key("HardDrive", "model") }} {{ inv.get_component_key("HardDrive", "interface") }} 
+    ({{ inv.get_component_key("HardDrive", "size") }})
+  </div>
+  <div class="extras">
+    {%- if inv.get_component_key("NetworkAdapter") -%}
+      <i class="fa fa-globe fa-fw"></i>
+    {%- endif -%}
+    {%- if inv.get_component_key("OpticalDrive") -%}
+      <i class="fa fa-eject fa-fw"></i>
+    {%- endif -%}
+    {%- if inv.get_component_key("SoundCard") -%}
+      <i class="fa fa-volume-up fa-fw"></i>
+    {%- endif -%}
+    {%- if inv.get_component_key("Motherboard") -%}
+      
+    {%- endif -%}
+  </div>
 {%- endmacro -%}
