@@ -8,7 +8,7 @@
 
 {%- block styles -%}
   {{ super() }}
-  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 {%- endblock -%}
 
 {%- block navbar -%}
@@ -28,6 +28,18 @@
     <div class="form-group">
       {{ field.label }}
       {{ set_autofocus(field, autofocus) }}
+    </div>
+  {%- elif field.type in ["QRField"] -%}
+    <div class="form-group">
+      {{ field.label }}
+      <div class="input-group">
+        {%- if autofocus -%}
+          {{ field(class_ = "form-control", autofocus = True) }}
+        {%- else -%}
+          {{ field() }}
+        {%- endif -%}
+        <div class="input-group-addon qrcode"><i class="fa fa-qrcode"></i></div>
+      </div>
     </div>
   {%- else -%}
     {{ set_autofocus(field, autofocus) }}
@@ -52,3 +64,12 @@
     </div>
   </div>
 {%- endblock -%}
+
+{%- if with_qr -%}
+  {%- block scripts -%}
+    {{ super() }}
+    <script src="{{ url_for('static', filename = 'libs/html5-qrcode/lib/jsqrcode-combined.min.js') }}"></script>
+    <script src="{{ url_for('static', filename = 'libs/html5-qrcode/lib/html5-qrcode.min.js') }}"></script>
+    <script src="{{ url_for('static', filename = 'js/assessment.js') }}"></script>
+  {%- endblock -%}
+{%- endif -%}
