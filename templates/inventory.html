@@ -11,7 +11,7 @@
   {{ super() }}
   <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
 
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename = 'libs/codemirror/5.25.2/lib/codemirror.css') }}" rel="stylesheet">
   <style>
     .CodeMirror { height: auto; }
   </style>
@@ -67,10 +67,10 @@
 {%- block scripts -%}
   {{ super() }}
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/codemirror.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/addon/runmode/runmode.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.0/addon/runmode/colorize.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.25.2/mode/javascript/javascript.min.js" integrity="sha256-N/yi99LnUpZtDxkbxqZN8IdK8NuEbll3ljpVc5LOUcg=" crossorigin="anonymous"></script>
+  <script src="{{ url_for('static', filename = 'libs/codemirror/5.25.2/lib/codemirror.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'libs/codemirror/5.25.2/addon/runmode/runmode.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'libs/codemirror/5.25.2/addon/runmode/colorize.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'libs/codemirror/5.25.2/mode/javascript/javascript.js') }}"></script>
 
   <script src="{{ url_for('static', filename = 'libs/momentjs/2.18.1/moment-with-locales.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/codemirrorize.js') }}"></script>
