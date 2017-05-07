@@ -24,7 +24,7 @@ class Config(object):
   TOTAL_PHASES = 6
 
 class ProdConfig(Config):
-  pass
+  HOST = "0.0.0.0"
 
 class DevelConfig(Config):
   TEMPLATES_AUTO_RELOAD = True
