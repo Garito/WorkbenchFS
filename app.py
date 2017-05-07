@@ -122,4 +122,7 @@ def getNews():
   return jsonify(result)
 
 if __name__ == "__main__":
-  app.run()
+  if "HOST" in app.config:
+    app.run(host=app.config["HOST"])
+  else:
+    app.run()
