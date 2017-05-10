@@ -114,3 +114,11 @@
     {%- endif -%}
   </div>
 {%- endmacro -%}
+
+{%- macro usb_snippet(uuid, usb) -%}
+  <a href="{{ url_for('computer.assess', comp = uuid) }}" class="btn btn-default usb">
+    <div><i class="fa fa-usb fa-2x"></i></div>
+    <div>{{ usb["vendor"] }} {{ usb["product"] }}</div>
+    <div>{{ usb["serial"] }}</div>
+  </a>
+{%- endmacro -%}

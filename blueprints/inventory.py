@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from datetime import datetime
+
 from flask import Blueprint, render_template, request, jsonify, current_app, flash, redirect, url_for
 
 from dateutil.parser import parse
@@ -44,6 +46,7 @@ def post_phase():
 @inv_bp.route("/assess/<inv>", methods = ["GET", "POST"])
 def assess(inv):
   inventory = Inventory.query.get(inv)
+
   if not inventory:
     flash("You can only assess existent inventories")
     return redirect(url_for("tests.tests"))
@@ -86,4 +89,12 @@ def assess(inv):
 def inventory(uuid):
   inv = Inventory.query.get_or_404(uuid)
   return render_template("inventory.html", inv = inv)
+
+@inv_bp.route("/live")
+def live():
+  now = datetime.utcnow()
+  now.replace(hour=0, minute=0, second=0, microsecond=0)
+  inventories = Inventory.query.filter(Inventory.created > now.date()).order_by(Inventory.created.desc())
+  return render_template("live.html", usbs = current_app.usbs, invs = inventories, now = now)
+
 

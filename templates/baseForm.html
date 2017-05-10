@@ -9,6 +9,7 @@
 {%- block styles -%}
   {{ super() }}
   <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+  <link href="{{ url_for('static', filename = 'libs/css-toggle-switch/4.0.2/dist/toggle-switch.css') }}" rel="stylesheet">
 {%- endblock -%}
 
 {%- block navbar -%}
@@ -24,11 +25,31 @@
 {%- endmacro -%}
 
 {%- macro my_form_field(field, autofocus = False) -%}
-  {%- if field.type in ["RadioField", "BooleanField"] -%}
+  {%- if field.type in ["RadioField"] -%}
     <div class="form-group">
       {{ field.label }}
       {{ set_autofocus(field, autofocus) }}
     </div>
+  {%- elif field.type in ["BooleanField", "BooleanFieldWithChoices"] -%}
+    <label class="switch-light" onclick="">
+      {%- if autofocus -%}
+        {{ field(autofocus = True)}}
+      {%- else -%}
+        {{ field()}}
+      {%- endif -%}
+      <strong>{{ field.label.text }}</strong>
+      <span class="well">
+        {%- if field.type in ["BooleanFieldWithChoices"] and field.choices -%}
+          {%- for choice in field.choices -%}
+            <span>{{ choice[1] }}</span>
+          {%- endfor -%}
+        {%- else -%}
+          <span>No</span>
+          <span>Yes</span>
+        {%- endif -%}
+        <a class="btn btn-primary"></a>
+      </span>
+    </label>
   {%- elif field.type in ["QRField"] -%}
     <div class="form-group">
       {{ field.label }}

@@ -1,0 +1,45 @@
+{%- from "snippets.html" import navbar with context -%}
+{%- from "snippets.html" import ComputerIcon -%}
+{%- from "snippets.html" import inventory_tr -%}
+{%- from "snippets.html" import usb_snippet -%}
+
+{%- extends "bootstrap/base.html" -%}
+{%- block title -%}Live session{%- endblock -%}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>Live session</h1>
+        <h2>Plugged usbs</h2>
+        <div class="usbs">
+          {%- for uuid, usb in usbs.items() -%}
+            {{ usb_snippet(uuid, usb) }}
+          {%- endfor -%}
+        </div>
+        <h2>Running inventories</h2>
+        <table class="table" last="{{ now }}">
+          {%- for inv in invs -%}
+            {{ inventory_tr(inv) }}
+          {%- endfor -%}
+        </table>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}
+
+{%- block scripts -%}
+  {{ super() }}
+  <script src="{{ url_for('static', filename = 'libs/momentjs/2.18.1/moment-with-locales.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/javascript.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/live.js') }}"></script>
+{%- endblock -%}

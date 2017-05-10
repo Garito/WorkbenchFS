@@ -97,9 +97,12 @@ def unplug(serial, computer):
 
   return jsonify({"acknowledge": True})
 
-@app.route("/getNews")
-def getNews():
-  result = {"usbs": app.usbs}
+@app.route("/getNews/<html>")
+def getNews(html = None):
+  if html is None:
+    result = {"usbs": app.usbs}
+  else:
+    result = {"usbs": render_template_string('{% from "snippets.html" import usb_snippet -%}{%- for key, usb in usbs.items() -%}{{ usb_snippet(key, usb) }}{%- endfor -%}', usbs = app.usbs)}
   last = parse(request.args["last"])
   newInvs = Inventory.query.filter(Inventory.created > last).order_by(Inventory.created.desc()).all()
   newPhases = InventoryPhase.query.filter(InventoryPhase.created > last).all()

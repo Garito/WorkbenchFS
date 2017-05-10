@@ -20,10 +20,16 @@
         <h1>Welcome to the Workbench's server <small>Choose your option</small></h1>
         {{ flashed_messages(container = False) }}
         <div class="text-center">
-          <a href="{{ url_for('user.users') }}" class="btn btn-default">
+          <a href="{{ url_for('inventory.live') }}" class="btn btn-default">
             <h2>
-              <div><i class="fa fa-users"></i></div>
-              <div>Users</div>
+              <div><i class="fa fa-recycle"></i></div>
+              <div>Live session</div>
+            </h2>
+          </a>
+          <a href="{{ url_for('inventory.inventories') }}" class="btn btn-default">
+            <h2>
+              <div><i class="fa fa-tachometer"></i></div>
+              <div>Inventories</div>
             </h2>
           </a>
           <a href="{{ url_for('computer.computers') }}" class="btn btn-default">
@@ -32,10 +38,16 @@
               <div>Computers</div>
             </h2>
           </a>
-          <a href="{{ url_for('inventory.inventories') }}" class="btn btn-default">
+          <a href="{{ url_for('configini') }}" class="btn btn-default">
             <h2>
-              <div><i class="fa fa-tachometer"></i></div>
-              <div>Inventories</div>
+              <div><i class="fa fa-gears"></i></div>
+              <div>config.ini</div>
+            </h2>
+          </a>
+          <a href="{{ url_for('user.users') }}" class="btn btn-default">
+            <h2>
+              <div><i class="fa fa-users"></i></div>
+              <div>Users</div>
             </h2>
           </a>
         </div>
