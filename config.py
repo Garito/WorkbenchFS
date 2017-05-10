@@ -21,10 +21,15 @@ class Config(object):
                        ("C", "Light functional defects (soft noises, dead pixels, erased key labels)"), 
                        ("D", "Serious functional defects (loud noises, annoying audio/video artifacts, missing keys)"))
 
+  ASK_CHOICES = (("no", "No"), ("yes", "Yes"), ("ask", "Ask what to do"))
+
   TOTAL_PHASES = 6
+
+  CONFIG_INI = "./config.ini"
 
 class ProdConfig(Config):
   HOST = "0.0.0.0"
+  CONFIG_INI = "/media/ereuse-data/config.ini"
 
 class DevelConfig(Config):
   TEMPLATES_AUTO_RELOAD = True

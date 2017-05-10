@@ -6,13 +6,18 @@ from flask import current_app
 
 from flask_wtf import FlaskForm
 from wtforms.ext.sqlalchemy.orm import model_form
-from wtforms import StringField, PasswordField, RadioField, TextAreaField, validators as wtf_v
+from wtforms import BooleanField, IntegerField, StringField, PasswordField, RadioField, TextAreaField, validators as wtf_v
 
 from flask_login import UserMixin
 
 from sqlalchemy_jsonfield import JSONField
 
 from extensions import db
+
+class BooleanFieldWithChoices(BooleanField):
+  def __init__(self, label = None, validators = None, false_values = None, **kwargs):
+    self.choices = kwargs.pop("choices")
+    super(BooleanFieldWithChoices, self).__init__(label, validators, false_values, **kwargs)
 
 class QRField(StringField):
   pass
@@ -136,4 +141,27 @@ class InventoryPhase(db.Model):
   def __repr__(self):
     return "<Phase for inventory {}>".format(self.inventory_uuid)
 
-  
+class ConfigINIForm(FlaskForm):
+  equip = RadioField("Equip")
+  pid = BooleanField("PID", false_values = ("no",))
+  id_ = BooleanField("ID", false_values = ("no",))
+  label = BooleanField("Label", false_values = ("no",))
+  comment = BooleanField("Comments", false_values = ("no",))
+  visual_grade = RadioField("Visual grade")
+  functional_grade = RadioField("Functional grade")
+  copy_to_usb = BooleanField("Copy to USB", false_values = ("no",))
+  sendtoserver = BooleanField("Send to server", false_values = ("no",))
+  smart = RadioField("SMART test")
+  stress = IntegerField("Stress test")
+  flask = StringField("Flask server")
+  debug = BooleanField("Debug mode", false_values = ("no",))
+  erase = RadioField("Erase disk")
+  mode = BooleanFieldWithChoices("Erase mode", choices = (("EraseBasic", "Basic"), ("EraseSectors", "Secure")), false_values = ("EraseBasic",))
+  steps = IntegerField("Erase iterations")
+  zeros = BooleanField("Overwrite with zeros", false_values = ("no",))
+  sign_output = BooleanField("Sign the inventory", false_values = ("no",))
+  install = RadioField("Install system image")
+  image_dir = StringField("Images folder")
+  image_name = StringField("Image name")
+  keyboard_layout = StringField("Keyboard layout")
+

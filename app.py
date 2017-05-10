@@ -3,6 +3,8 @@
 
 from os import environ
 
+from ConfigParser import ConfigParser
+
 from json import dumps
 
 from dateutil.parser import parse
@@ -15,7 +17,7 @@ from flask_login import login_user, logout_user, login_required
 
 from extensions import debugTB, db, login_manager
 
-from models import User, LoginForm, Inventory, InventoryPhase
+from models import User, LoginForm, Inventory, InventoryPhase, ConfigINIForm
 
 from blueprints.user import user_bp
 from blueprints.computer import comp_bp
@@ -123,6 +125,59 @@ def getNews(html = None):
   
 
   return jsonify(result)
+
+@app.route("/configini", methods = ["GET", "POST"])
+def configini():
+  parser = ConfigParser()
+  parser.read(app.config["CONFIG_INI"])
+
+  options = {"DEFAULT": list(parser.defaults().keys())}
+
+  default_opts = set(options["DEFAULT"])
+
+  for section in parser.sections():
+    opts = parser.options(section)
+    options[section] = list(set(opts).difference(default_opts))
+
+  keys = dict(parser.defaults())
+  for section in parser.sections():
+    keys.update(dict(parser.items(section)))
+
+  req = request.form.copy()
+  req.update(keys)
+
+  form = ConfigINIForm(req)
+
+  device_choices = list(app.config["DEVICE_TYPES"])
+  device_choices.append(("no", "Do not ask"))
+  form.equip.choices = device_choices
+  visual_choices = list(app.config["VISUAL_GRADES"])
+  visual_choices.append(("no", "Do not ask"))
+  form.visual_grade.choices = visual_choices
+  functional_choices = list(app.config["FUNCTIONAL_GRADES"])
+  functional_choices.append(("no", "Do not ask"))
+  form.functional_grade.choices = functional_choices
+  form.smart.choices = (("none", "Do not test"), ("short", "Short test"), ("long", "Long test"))
+  form.erase.choices = app.config["ASK_CHOICES"]
+  form.install.choices = app.config["ASK_CHOICES"]
+
+  if form.validate_on_submit():
+    for section, options in options.items():
+      for option in options:
+        if option == "_id":
+          parser.set(section, option, ["no", "yes"][int(form.data["id_"])])
+        else:
+          if isinstance(form.data[option], bool):
+            parser.set(section, option, ["no", "yes"][int(form.data[option])])
+          else:
+            parser.set(section, option, form.data[option])
+
+    with open(app.config["CONFIG_INI"], "wb") as f:
+      parser.write(f)
+
+    flash("The config.ini has been saved", "success")
+
+  return render_template("baseForm.html", form = form, title = "Configure config.ini", btnSubmit = "Save")
 
 if __name__ == "__main__":
   if "HOST" in app.config:
