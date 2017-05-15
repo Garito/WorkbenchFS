@@ -48,7 +48,7 @@ def computer(uuid):
 @comp_bp.route("/assess/<comp>", methods = ["GET", "POST"])
 def assess(comp):
   computer = Computer.query.get(comp)
-  inventory = Inventory.query.filter(Inventory.computer_uuid).order_by(Inventory.created.desc()).first()
+  inventory = Inventory.query.filter(Inventory.computer_uuid == comp).order_by(Inventory.created.desc()).first()
 
   if computer is None:
     form = FullAssessmentForm(request.form)
@@ -62,15 +62,15 @@ def assess(comp):
   form.functional_grade.choices = current_app.config["FUNCTIONAL_GRADES"]
 
   if form.validate_on_submit():
-    if not inventory.computer:
+    if computer:
+      flash_message = "The assessment has been saved"
+    else:
       computer = Computer(comp, form.data["label"], form.data["dev_type"])
       db.session.add(computer)
 
       inventory.computer = computer
 
       flash_message = "The computer has created and assess"
-    else:
-      flash_message = "The assessment has been saved"
 
     inventory.visual_grade = form.data["visual_grade"]
     inventory.functional_grade = form.data["functional_grade"]
