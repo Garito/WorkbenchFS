@@ -2,6 +2,7 @@
 #!/usr/bin/env python
 
 from os import environ
+from os.path import exists
 
 from ConfigParser import ConfigParser
 
@@ -22,6 +23,16 @@ from models import User, LoginForm, Inventory, InventoryPhase, ConfigINIForm
 from blueprints.user import user_bp
 from blueprints.computer import comp_bp
 from blueprints.inventory import inv_bp
+
+def init_db():
+  db.create_all()
+  admin = User("eReuseAdmin", "admin@ereuse.org", True)
+  admin.set_password("eReuse")
+  db.session.add(admin)
+  regular = User("ereuse", "ereuse@ereuse.org")
+  regular.set_password("ereuse")
+  db.session.add(regular)
+  db.session.commit()
 
 def create_app(name, config = None):
   app = Flask(name)
@@ -45,6 +56,13 @@ def create_app(name, config = None):
   return app
 
 app = create_app(__name__)
+
+@app.before_first_request
+def check_db():
+  path = app.config["SQLALCHEMY_DATABASE_URI"][10:]
+
+  if not exists(path):
+    init_db()
 
 @app.template_filter("pretty_json")
 def pretty_json(j):
