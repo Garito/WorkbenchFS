@@ -29,8 +29,8 @@ class Config(object):
 
 class ProdConfig(Config):
   HOST = "0.0.0.0"
-  SQLALCHEMY_DATABASE_URI = "sqlite:////media/ereuse-data/data.db"
-  CONFIG_INI = "/media/ereuse-data/config.ini"
+  SQLALCHEMY_DATABASE_URI = "sqlite:////home/ereuse/data/data.db"
+  CONFIG_INI = "/home/ereuse/data/config.ini"
 
 
 class DevelConfig(Config):
