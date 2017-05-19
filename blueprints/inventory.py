@@ -94,7 +94,7 @@ def inventory(uuid):
 def live():
   now = datetime.utcnow()
   now.replace(hour=0, minute=0, second=0, microsecond=0)
-  inventories = Inventory.query.filter(Inventory.created > now.date()).order_by(Inventory.created.desc())
+  inventories = Inventory.query.filter(Inventory.created > now.date()).order_by(Inventory.created.desc()).all()
   return render_template("live.html", usbs = current_app.usbs, invs = inventories, now = now)
 
 
