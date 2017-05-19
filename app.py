@@ -147,6 +147,7 @@ def getNews(html = None):
 @app.route("/configini", methods = ["GET", "POST"])
 def configini():
   parser = ConfigParser()
+  parser.optionxform = str
   parser.read(app.config["CONFIG_INI"])
 
   options = {"DEFAULT": list(parser.defaults().keys())}
@@ -168,22 +169,22 @@ def configini():
 
   device_choices = list(app.config["DEVICE_TYPES"])
   device_choices.append(("no", "Do not ask"))
-  form.equip.choices = device_choices
+  form.EQUIP.choices = device_choices
   visual_choices = list(app.config["VISUAL_GRADES"])
   visual_choices.append(("no", "Do not ask"))
-  form.visual_grade.choices = visual_choices
+  form.VISUAL_GRADE.choices = visual_choices
   functional_choices = list(app.config["FUNCTIONAL_GRADES"])
   functional_choices.append(("no", "Do not ask"))
-  form.functional_grade.choices = functional_choices
-  form.smart.choices = (("none", "Do not test"), ("short", "Short test"), ("long", "Long test"))
-  form.erase.choices = app.config["ASK_CHOICES"]
-  form.install.choices = app.config["ASK_CHOICES"]
+  form.FUNCTIONAL_GRADE.choices = functional_choices
+  form.SMART.choices = (("none", "Do not test"), ("short", "Short test"), ("long", "Long test"))
+  form.ERASE.choices = app.config["ASK_CHOICES"]
+  form.INSTALL.choices = app.config["ASK_CHOICES"]
 
   if form.validate_on_submit():
     for section, options in options.items():
       for option in options:
-        if option == "_id":
-          parser.set(section, option, ["no", "yes"][int(form.data["id_"])])
+        if option == "_ID":
+          parser.set(section, option, ["no", "yes"][int(form.data["ID_"])])
         else:
           if isinstance(form.data[option], bool):
             parser.set(section, option, ["no", "yes"][int(form.data[option])])
