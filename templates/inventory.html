@@ -54,10 +54,18 @@
         <table class="table">
           {%- for phase in inv.phases -%}
             <tr>
+              <td class="toggler"><i class="fa fa-plus"></i></td>
               <td><time datetime="{{ phase.created.isoformat() }}">{{ phase.created }}</time></td>
               <td><div class="codemirror">{{ phase.json | pretty_json | safe }}</div></td>
+              <td><a href="{{ url_for('inventory.download_phase', inv = inv._uuid, phase = loop.index0) }}"><i class="fa fa-download"></i></a>
             </tr>
           {%- endfor -%}
+          <tr>
+            <td class="toggler"><i class="fa fa-minus"></i></td>
+            <td>Consolidated</td>
+            <td><div class="codemirror">{{ inv.consolidate_json() | pretty_json | safe}}</div></td>
+            <td><a href="{{ url_for('inventory.download_phase', inv = inv._uuid, phase = 'consolidated') }}"><i class="fa fa-download"></i></a>
+          </tr>
         </table>
       </div>
     </div>
@@ -75,4 +83,5 @@
   <script src="{{ url_for('static', filename = 'libs/momentjs/2.18.1/moment-with-locales.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/codemirrorize.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/javascript.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'js/inventory.js') }}"></script>
 {%- endblock -%}
