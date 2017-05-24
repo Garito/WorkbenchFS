@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from dateutil.parser import parse
+
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask import current_app
@@ -112,6 +114,43 @@ class Inventory(db.Model):
         return component[key] if key else component
 
     return None
+
+  def consolidate_json(self):
+    phases = self.phases.all()
+
+    times = [phase.json["created"] for phase in phases]
+
+    if len(phases) > 1:
+      json = phases[1].json.copy()
+      json["created"] = phases[0].json["created"]
+    else:
+      json = phases[0].json.copy()
+
+    elapsed = parse(times[-1]) - parse(times[0])
+    json["phases"] = {"times": times, "elapsed": str(elapsed)}
+
+    if self.comments:
+      json["comment"] = self.comments
+
+    if self.visual_grade and self.functional_grade:
+      json["condition"] = {"appearance": {"general": self.visual_grade}, "functionality": {"general": self.functional_grade}}
+
+    if self.computer:
+      json["label"] = self.computer.label
+      json["device"]["type"] = self.computer.dev_type
+
+    if "signed_data" in phases[2].json:
+      json["signed_data"] = phases[2].json["signed_data"]
+
+    if "filename" in phases[2].json:
+      json["filename"] = phases[2].json["filename"]
+
+    json["copy_to_usb"] = phases[3].json["copy_to_usb"]
+    json["inventory"] = phases[3].json["inventory"]
+
+    json["stress_test_mins"] = phases[4].json["stress_test_mins"]
+      
+    return json
 
   def __repr__(self):
     return "<Inventory {}>".format(self.created)
