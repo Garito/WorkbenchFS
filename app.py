@@ -4,11 +4,15 @@
 from os import environ
 from os.path import exists
 
+from subprocess import check_output
+
 from ConfigParser import ConfigParser
 
 from json import dumps
 
 from dateutil.parser import parse
+
+import requests
 
 from flask import Flask, render_template, render_template_string, request, flash, redirect, url_for, jsonify
 
@@ -23,6 +27,18 @@ from models import User, LoginForm, Inventory, InventoryPhase, ConfigINIForm
 from blueprints.user import user_bp
 from blueprints.computer import comp_bp
 from blueprints.inventory import inv_bp
+
+def getLocalGitLastDate():
+  date = parse(check_output(["git", "log", "-1", "--format=%ci"]))
+  return date
+
+def getRemoteGitLastDate():
+  r = requests.get("https://api.github.com/repos/{}/{}/commits".format(app.config["GIT_USER"], app.config["GIT_REPO"]))
+  return parse(r.json()[0]["commit"]["committer"]["date"])
+
+def pullRemoteGit():
+  output = check_output(["git", "pull"])
+  return output
 
 def init_db():
   db.create_all()
@@ -197,6 +213,17 @@ def configini():
     flash("The config.ini has been saved", "success")
 
   return render_template("baseForm.html", form = form, title = "Configure config.ini", btnSubmit = "Save")
+
+@app.route("/exchange")
+def exchange():
+  local_git_date = getLocalGitLastDate()
+  remote_git_date = getRemoteGitLastDate()
+  return render_template("exchange.html", local_git_date = local_git_date, remote_git_date = remote_git_date, root_path = app.root_path)
+
+@app.route("/pullRemoteGit")
+def pullGit():
+  result = pullRemoteGit()
+  return jsonify({"result": result})
 
 if __name__ == "__main__":
   if "HOST" in app.config:

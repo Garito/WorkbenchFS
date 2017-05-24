@@ -27,6 +27,9 @@ class Config(object):
 
   CONFIG_INI = "./config.ini"
 
+  GIT_USER = "Garito"
+  GIT_REPO = "WorkbenchFS"
+
 class ProdConfig(Config):
   HOST = "0.0.0.0"
   SQLALCHEMY_DATABASE_URI = "sqlite:////home/ereuse/data/data.db"

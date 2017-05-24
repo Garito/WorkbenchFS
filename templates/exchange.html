@@ -1,0 +1,39 @@
+{%- from "bootstrap/utils.html" import flashed_messages -%}
+{%- from "snippets.html" import navbar with context -%}
+
+{% extends "bootstrap/base.html" %}
+{% block title %}Exchange data page{% endblock %}
+
+{%- block styles -%}
+  {{ super() }}
+  <link href="{{ url_for('static', filename = 'libs/font-awesome/4.7.0/css/font-awesome.min.css') }}" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+{%- endblock -%}
+
+{%- block navbar -%}
+  {{ navbar() }}
+{%- endblock -%}
+
+{%- block content -%}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-xs-12">
+        <h1>Exchange data page <small>Choose your option</small></h1>
+        {{ flashed_messages(container = False) }}
+        {%- if local_git_date == remote_git_date -%}
+          {%- set btn_class = "default disable" -%}
+        {%- else -%}
+          {%- set btn_class = "primary" -%}
+        {%- endif -%}
+        <button type="button" href="{{ url_for('pullGit') }}" class="btn btn-{{ btn_class }} btn-lg update">
+          <i class="fa fa-download"></i> Update version
+        </button>
+        <h3>{{ root_path }}</h3>
+      </div>
+    </div>
+  </div>
+{%- endblock -%}
+
+{%- block scripts -%}
+  {{ super() }}
+  <script src="{{ url_for('static', filename='js/exchange.js') }}"></script>
+{%- endblock -%}
