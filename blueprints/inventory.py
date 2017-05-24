@@ -2,7 +2,9 @@
 
 from datetime import datetime
 
-from flask import Blueprint, render_template, request, jsonify, current_app, flash, redirect, url_for
+from json import dumps
+
+from flask import Blueprint, render_template, request, jsonify, current_app, flash, redirect, url_for, make_response
 
 from dateutil.parser import parse
 
@@ -93,8 +95,25 @@ def inventory(uuid):
 @inv_bp.route("/live")
 def live():
   now = datetime.utcnow()
-  now.replace(hour=0, minute=0, second=0, microsecond=0)
   inventories = Inventory.query.filter(Inventory.created > now.date()).order_by(Inventory.created.desc()).all()
   return render_template("live.html", usbs = current_app.usbs, invs = inventories, now = now)
+
+@inv_bp.route("/download/<inv>/<phase>")
+def download_phase(inv, phase):
+  inv = Inventory.query.get(inv)
+  filename = inv.phases[2].json["filename"]
+  parts = filename.split(".")
+  if phase == "consolidated":
+    json = inv.consolidate_json()
+    parts[0] = "{},consolidated".format(parts[0])
+  else:
+    json = inv.phases[int(phase)].json
+    parts[0] = "{},phase{}".format(parts[0], phase)
+
+  resp = make_response(dumps(json, indent = 2))
+  resp.headers["Content-Disposition"] = "attachment; filename='{}'".format(".".join(parts))
+  resp.headers["Content-Type"] = "application/javascript"
+
+  return resp
 
 
