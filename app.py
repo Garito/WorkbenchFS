@@ -14,7 +14,7 @@ from dateutil.parser import parse
 
 import requests
 
-from flask import Flask, render_template, render_template_string, request, flash, redirect, url_for, jsonify
+from flask import Flask, render_template, render_template_string, request, flash, redirect, url_for, jsonify, current_app
 
 from flask_bootstrap import Bootstrap
 
@@ -197,10 +197,15 @@ def configini():
   form.INSTALL.choices = app.config["ASK_CHOICES"]
 
   if form.validate_on_submit():
+
+    current_app.logger.info(form.data)
+
     for section, options in options.items():
       for option in options:
         if option == "_ID":
           parser.set(section, option, ["no", "yes"][int(form.data["ID_"])])
+        elif option == "MODE":
+          parser.set(section, option, ["EraseSectors", "EraseBasic"][int(form.data[option])])
         else:
           if isinstance(form.data[option], bool):
             parser.set(section, option, ["no", "yes"][int(form.data[option])])
