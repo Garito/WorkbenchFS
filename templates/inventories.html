@@ -23,7 +23,7 @@
         <h1>Inventories <small>({{ items.total }})</small></h1>
         {{ flashed_messages(container = False) }}
         <div class="table-responsive">
-          <table class="table" last="{{ items.query.first().created.isoformat() }}">
+          <table class="table" last="{{ last_date }}">
             {%- set last_date = {"value": None} -%}
             {%- for item in items.items -%}
               {%- if item.created.date() != last_date["value"] -%}

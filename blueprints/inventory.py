@@ -17,7 +17,8 @@ inv_bp = Blueprint("inventory", __name__)
 @inv_bp.route("/")
 def inventories():
   items = Inventory.query.order_by(Inventory.created.desc()).paginate()
-  return render_template("inventories.html", items = items, usbs = current_app.usbs)
+  last_date = items.query.first().created.isoformat() if items.total else datetime.utcnow().isoformat()
+  return render_template("inventories.html", items = items, usbs = current_app.usbs, last_date = last_date)
 
 @inv_bp.route("/post_phase", methods = ["POST"])
 def post_phase():
