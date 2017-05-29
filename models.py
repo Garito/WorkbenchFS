@@ -109,9 +109,11 @@ class Inventory(db.Model):
     return self.phases.count() * 100 / current_app.config["TOTAL_PHASES"]
 
   def get_component_key(self, name, key = None):
-    for component in self.phases[0].json["components"]:
+    phases = self.phases.all()
+    json = phases[1].json if len(phases) else phases[0].json
+    for component in json["components"]:
       if component["@type"] == name:
-        return component[key] if key else component
+        return component.get(key, None) if key else component
 
     return None
 
@@ -149,7 +151,12 @@ class Inventory(db.Model):
     json["inventory"] = phases[3].json["inventory"]
 
     json["stress_test_mins"] = phases[4].json["stress_test_mins"]
-      
+
+    if "install_image_ok" in phases[5].json:
+      json["install_image_ok"] = phases[5].json["install_image_ok"]
+    if "image_name" in phases[5].json:
+      json["image_name"] = phases[5].json["image_name"]
+       
     return json
 
   def __repr__(self):
