@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from datetime import timedelta
+
 from dateutil.parser import parse
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -124,12 +126,14 @@ class Inventory(db.Model):
 
     if len(phases) > 1:
       json = phases[1].json.copy()
-      json["created"] = phases[0].json["created"]
+      json["date"] = parse(phases[0].json["created"]).replace(microsecond = 0).isoformat()
     else:
       json = phases[0].json.copy()
 
+    del json["device"]["_uuid"]
+    del json["created"]
+
     elapsed = parse(times[-1]) - parse(times[0])
-    json["phases"] = {"times": times, "elapsed": str(elapsed)}
 
     if self.comments:
       json["comment"] = self.comments
@@ -141,21 +145,15 @@ class Inventory(db.Model):
       json["label"] = self.computer.label
       json["device"]["type"] = self.computer.dev_type
 
-    if "signed_data" in phases[2].json:
-      json["signed_data"] = phases[2].json["signed_data"]
+    json["inventory"] = {"elapsed": str(elapsed).split(".")[0]}
 
-    if "filename" in phases[2].json:
-      json["filename"] = phases[2].json["filename"]
-
-    json["copy_to_usb"] = phases[3].json["copy_to_usb"]
-    json["inventory"] = phases[3].json["inventory"]
-
-    json["stress_test_mins"] = phases[4].json["stress_test_mins"]
+    json["tests"] = [{"elapsed": str(timedelta(minutes = phases[4].json["stress_test_mins"])), "success": len(phases) > 4, "@type": "StressTest"}]
 
     if "install_image_ok" in phases[5].json:
-      json["install_image_ok"] = phases[5].json["install_image_ok"]
-    if "image_name" in phases[5].json:
-      json["image_name"] = phases[5].json["image_name"]
+      install_elapsed = str(parse(times[5]) - parse(times[4]))
+      json["osInstallation"] = {"elapsed": install_elapsed, "label": phases[5].json["image_name"], "success": phases[5].json["install_image_ok"]}
+
+    json["snapshotSoftware"] = "Workbench"
        
     return json
 
