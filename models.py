@@ -133,7 +133,7 @@ class Inventory(db.Model):
     del json["device"]["_uuid"]
     del json["created"]
 
-    elapsed = parse(times[-1]) - parse(times[0])
+    elapsed = parse(times[5]) - parse(times[0])
 
     if self.comments:
       json["comment"] = self.comments

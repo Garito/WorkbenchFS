@@ -12,6 +12,8 @@ from models import Computer, Inventory, InventoryPhase, AssessmentForm, FullAsse
 
 from extensions import db
 
+import requests
+
 inv_bp = Blueprint("inventory", __name__)
 
 @inv_bp.route("/")
@@ -21,8 +23,9 @@ def inventories():
   return render_template("inventories.html", items = items, usbs = current_app.usbs, last_date = last_date)
 
 @inv_bp.route("/post_phase", methods = ["POST"])
-def post_phase():
-  json = request.get_json()
+def post_phase(json = None):
+  if json is None:
+    json = request.get_json()
   inv_uuid = json["_uuid"]
   created = parse(json["created"])
   inv = Inventory.query.get(inv_uuid)
@@ -98,6 +101,33 @@ def live():
   now = datetime.utcnow()
   inventories = Inventory.query.filter(Inventory.created > now.date()).order_by(Inventory.created.desc()).all()
   return render_template("live.html", usbs = current_app.usbs, invs = inventories, now = now)
+
+@inv_bp.route("/upload/<inv>")
+def upload(inv):
+  inv = Inventory.query.get(inv)
+  json = inv.consolidate_json()
+
+  r = requests.post("http://devicehub.ereuse.net/login", data = dumps({"email": "a@a.a", "password": "1234"}), headers = {"content-type": "application/json"})
+  r_json = r.json()
+
+  if "token" in r_json:
+    headers = {"content-type": "application/json", "accept": "application/json", "authorization": "Basic {}".format(r_json["token"])}
+    s_r = requests.post("http://devicehub.ereuse.net/{}/events/devices/snapshot".format(r_json["defaultDatabase"]), data = dumps(json), headers = headers)
+    s_r_json = s_r.json()
+
+    if "_updated" in s_r_json:
+      s_r_json["_uuid"] = inv._uuid
+      s_r_json["created"] = datetime.utcnow().isoformat()
+      post_phase(s_r_json)
+
+      flash("JSON successfuly uploaded", "success")
+    else:
+      flash("Can't upload the JSON: {}".format(s_r_json))
+
+  else:
+    flash("Can't login on the hub", "danger")
+
+  return redirect(url_for(".inventory", uuid = inv._uuid))
 
 @inv_bp.route("/download/<inv>/<phase>")
 def download_phase(inv, phase):

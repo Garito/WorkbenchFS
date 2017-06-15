@@ -64,7 +64,10 @@
             <td class="toggler"><i class="fa fa-minus"></i></td>
             <td>Consolidated</td>
             <td><div class="codemirror">{{ inv.consolidate_json() | pretty_json | safe}}</div></td>
-            <td><a href="{{ url_for('inventory.download_phase', inv = inv._uuid, phase = 'consolidated') }}"><i class="fa fa-download"></i></a>
+            <td>
+              <a href="{{ url_for('inventory.download_phase', inv = inv._uuid, phase = 'consolidated') }}"><i class="fa fa-download"></i>
+              <a href="{{ url_for('inventory.upload', inv = inv._uuid) }}"><i class="fa fa-upload"></i>
+            </a>
           </tr>
         </table>
       </div>
