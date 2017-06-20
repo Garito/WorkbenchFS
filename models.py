@@ -150,7 +150,7 @@ class Inventory(db.Model):
     json["tests"] = [{"elapsed": str(timedelta(minutes = phases[4].json["stress_test_mins"])), "success": len(phases) > 4, "@type": "StressTest"}]
 
     if "install_image_ok" in phases[5].json:
-      install_elapsed = str(parse(times[5]) - parse(times[4]))
+      install_elapsed = str(parse(times[5]) - parse(times[4])).split(".")[0]
       json["osInstallation"] = {"elapsed": install_elapsed, "label": phases[5].json["image_name"], "success": phases[5].json["install_image_ok"]}
 
     json["snapshotSoftware"] = "Workbench"
